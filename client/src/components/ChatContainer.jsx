@@ -36,6 +36,17 @@ const ChatContainer = ({setSelectedUser,selectedUser}) => {
         ))}
         
       </div>
+      <div className='absolute bottom-0 left-0 right-0 flex items-center  gap-3 p-3'>
+       <div className=' flex-1 flex bg-gray-100/12 px-2 align-centre rounded-full gap-2'>
+        <input type="text" placeholder='message'  className='flex-1 text-sm p-3 border-none rounded-lg outline-none text-white placeholder-gray-400'/>
+        <input type='text' id='image' accept='img/png, img/jpeg' hidden/>
+        <label htmlFor="image">
+          <img src={assets.gallery_icon} className='w-5 mr-2 mt-3 cursor-pointer'></img>
+        </label>
+       </div>
+        <img src={assets.send_button} className='w-7 cursor pointer'/>
+      </div>
+     
     </div>
      ):(<div className='flex flex-col justify-center items-center text-gray-500 relative
       bg-white/10 max-md:hidden'>
