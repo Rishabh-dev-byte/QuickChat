@@ -29,7 +29,7 @@ const ProfilePage = () => {
          <textarea type='text' value={Bio} onChange={(e)=>{setBio(e.target.value)}} placeholder='enter your bio' row={4} className='border-gray-400 border-2 rounded-lg mt-2 text-center focus:outline-none focus:ring-2 focus:ring-violet-500' required></textarea>
          <button type='submit'className='border border-gray-200 rounded-xl'>Update Profile</button>
         </form>
-        <img src={assets.logo_icon}></img>
+        <img src={assets.logo_icon} className='w-60 p-5'></img>
           
 
 
