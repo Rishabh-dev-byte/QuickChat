@@ -4,7 +4,7 @@ import app from "./app.js"
 
 dotenv.config({
     path:'./.env'
-})
+})// It loads environment variables from your .env file into process.env
 
 connectDB().then(()=>{
     app.listen(process.env.PORT,()=>{
