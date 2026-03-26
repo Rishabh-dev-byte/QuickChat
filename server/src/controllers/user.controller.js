@@ -24,7 +24,7 @@ const signUp = asyncHandler(async(req,res)=>{
         throw new ApiError(409,"user with this email or password already exist")
     }
 
-    const avatarLocalPath = req.files?.avatar[0]?.path;
+    const avatarLocalPath = req.file?.path;
 
     if(!avatarLocalPath){
         throw new ApiError(400,"avatar file not uploaded")

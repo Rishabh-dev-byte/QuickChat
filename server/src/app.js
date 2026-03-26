@@ -15,4 +15,9 @@ app.use(cors({
 app.use(express.json({limit:"4mb"})) //Parses incoming JSON request bodies Attaches the result to req.body
 app.use(cookieParser()) //It tells Express Before any route runs, parse cookies and attach them to req.cookies
 
+import userRouter from "./routes/user.route.js"
+
+app.use("api/v1/users",userRouter)
+
+
 export default app
