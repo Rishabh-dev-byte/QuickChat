@@ -17,7 +17,7 @@ app.use(cookieParser()) //It tells Express Before any route runs, parse cookies 
 
 import userRouter from "./routes/user.route.js"
 
-app.use("api/v1/users",userRouter)
+app.use("/api/v1/users",userRouter) //It tells your Express app For any request that starts with api/v1/users pass control to userRouter.
 
 
 export default app
