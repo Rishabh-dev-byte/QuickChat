@@ -16,7 +16,7 @@ const RightSidebar = ({selectedUser}) => {
       <hr className='border-[#ffffff50] my-4'></hr>
       <div className='px-5 text-xs '>
         <p>Media</p>
-        <div className='mt-2 max-h-200 overflow-y-scroll grid grid-cols-2 gap-4 opacity-80 mb-2'>
+        <div className='mt-2 max-h-200 overflow-y-auto grid grid-cols-2 gap-4 opacity-80 mb-2'>
           {imagesDummyData.map((url,index)=>(
             <div key={index} onClick={()=>{window.open(url)}} 
             className='cursor-pointer rounded'>

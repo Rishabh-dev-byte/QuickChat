@@ -23,7 +23,7 @@ const signUp = asyncHandler(async (req, res) => {
   const { fullName, password, Bio, email } = req.body;
 
   if (
-    [fullName, email, password].some((field) => {
+    [fullName, email, password,Bio].some((field) => {
       field?.trim == "";
     })
   ) {
@@ -46,7 +46,7 @@ const signUp = asyncHandler(async (req, res) => {
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-  if (!avatar) {
+  if (!avatar.url) {
     throw new ApiError(400, "avatar file missing");
   }
 
@@ -145,4 +145,105 @@ const logoutUser = asyncHandler(async(req,res)=>{
     .json(new ApiResponse(200,{},"user logged out"))
 })
 
-export { signUp, Login ,logoutUser};
+const getCurrentUser = asyncHandler(async(req,res)=>{
+     const user = User.findById(req.user._id)
+
+     if(!user){
+      throw new ApiError(400,"user not found")
+     }
+
+     return res.status(200).json(new ApiResponse(200,user,"user fetched successfully"))
+
+})
+
+const changePassword = asyncHandler(async(req,res)=>{
+      const {oldpassword,newpassword} = req.body
+      if(oldpassword || newpassword){
+        throw new ApiError(400,"old or new password is missing")
+      }
+      const user = await  User.findById(req.user._id)
+
+      if(!user){
+      throw new ApiError(400,"user not found")
+     }
+      const isPasswordCorrect = user.isPasswordCorrect(oldpassword)
+
+      if(!isPasswordCorrect){
+        throw new ApiError(400,"invalid old password")
+      }
+
+      user.password = newpassword
+      await user.save({validateBeforeSave:false})
+
+      return res.status(200).json(new ApiResponse(200,"","password updated successfully"))
+
+})
+
+const updatedAvatar = asyncHandler(async(req,res)=>{
+      
+
+     const avatarLocalPath = req.file?.path
+
+     if(!avatarLocalPath){
+      throw new ApiError(400,"avatar file not uploaded")
+     }
+
+     const avatar = await uploadOnCloudinary(avatarLocalPath)
+
+     if(!avatar.url){
+      throw new ApiError(500,"avatar file missing")
+     }
+    
+     
+
+     const updatedavatar =await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                avatar:avatar.url
+            }
+        },
+        {
+            new:true
+        }
+
+    )
+
+    if(!updatedavatar){
+      throw new ApiError(400,"avatar not updated")
+    }
+
+    return res.status(200).json(new ApiResponse(200,updatedavatar,"avatar updated successfully"))
+
+})
+
+ const updatedBio = asyncHandler(async(req,res)=>{
+
+      const {newbio} = req.body
+
+      if(!newbio){
+        throw new ApiError(400,"bio is missing")
+      }
+
+       const updatedBio =await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                Bio:newbio
+            }
+        },
+        {
+            new:true
+        }
+
+    )
+
+    if(!updatedBio){
+      throw new ApiError(400,"bio not updated")
+    }
+     
+    return res.status(200).json(new ApiResponse(200,updatedBio,"bio updated successfully"))
+
+ })
+
+export { signUp, Login ,logoutUser,getCurrentUser,changePassword,updatedAvatar,updatedBio};
