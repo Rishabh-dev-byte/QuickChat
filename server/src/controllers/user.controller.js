@@ -179,71 +179,45 @@ const changePassword = asyncHandler(async(req,res)=>{
 
 })
 
-const updatedAvatar = asyncHandler(async(req,res)=>{
-      
+const updateProfile = asyncHandler(async(req,res)=>{
+   const {name,bio} = req.body
+   const avatarLocalPath = req.file?.path
 
-     const avatarLocalPath = req.file?.path
+   const updatedFields ={}
 
-     if(!avatarLocalPath){
-      throw new ApiError(400,"avatar file not uploaded")
-     }
-
-     const avatar = await uploadOnCloudinary(avatarLocalPath)
-
-     if(!avatar.url){
-      throw new ApiError(500,"avatar file missing")
-     }
-    
-     
-
-     const updatedavatar =await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set:{
-                avatar:avatar.url
-            }
-        },
-        {
-            new:true
-        }
-
-    )
-
-    if(!updatedavatar){
-      throw new ApiError(400,"avatar not updated")
+   if(avatarLocalPath){
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    if(!avatar){
+      throw new ApiError(400,"avatar missing")
     }
+    updatedFields.avatar = avatar.url;
+   }
+   
+   if(name){
+    updatedFields.fullName=name
+   }
 
-    return res.status(200).json(new ApiResponse(200,updatedavatar,"avatar updated successfully"))
+   if(bio){
+    updatedFields.Bio=bio
+   }
 
+   if(Object.keys(updatedFields).length === 0){
+    throw new ApiError(400,"nothing to update")
+   }
+
+
+
+   const updatedProfile = await User.findByIdAndUpdate(req.user._id,
+    {$set:updatedFields},
+    {new:true}    
+   )
+
+   if(!updatedProfile){
+    throw new ApiError(400,"User not updated")
+   }
+
+   return res.status(200).json(new ApiResponse(200,updatedProfile,"user updated successfully"))
 })
 
- const updatedBio = asyncHandler(async(req,res)=>{
 
-      const {newbio} = req.body
-
-      if(!newbio){
-        throw new ApiError(400,"bio is missing")
-      }
-
-       const updatedBio =await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $set:{
-                Bio:newbio
-            }
-        },
-        {
-            new:true
-        }
-
-    )
-
-    if(!updatedBio){
-      throw new ApiError(400,"bio not updated")
-    }
-     
-    return res.status(200).json(new ApiResponse(200,updatedBio,"bio updated successfully"))
-
- })
-
-export { signUp, Login ,logoutUser,getCurrentUser,changePassword,updatedAvatar,updatedBio};
+export { signUp, Login ,logoutUser,getCurrentUser,changePassword,updateProfile};

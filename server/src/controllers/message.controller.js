@@ -49,77 +49,46 @@ const toggleSeen = asyncHandler(async(req,res)=>{
 const sendMessage = asyncHandler(async(req,res)=>{
     const {id} = req.params
     const {text} = req.body
+    const mediaLocalPath = req.file?.path
 
-    if(!id || !text){
-        throw new ApiError(400,"id or message is missing")
-    }
+    if (!text && !mediaLocalPath) {
+  throw new ApiError(400, "message cannot be empty");
+}
 
-    const message = await Message.create({
+    const sentFields={
           senderId:req.user._id,
           receiverId:id,
-          text
-    })
+    }
+
+    if(mediaLocalPath){
+        const media = await uploadOnCloudinary(mediaLocalPath)
+        if(!media?.url){
+            throw new ApiError(400,"media not found")
+        }
+        sentFields.image = media.url
+    }
+
+    if(text){
+        sentFields.text = text
+    }
+    const message = await Message.create(sentFields)
 
     //emit new message to the receiver
 
-    const receiverSocketId = userSocketMap[receiverId]
+    const receiverSocketId = userSocketMap[id]
     if(receiverSocketId){
         io.to(receiverSocketId).emit("message",message)
     }
 
-    const createdMsg = await Message.findById(message._id)
-
-    if(!createdMsg){
-        throw new ApiError(500,"message not created")
-    }
-
-    return res.status(200).json(new ApiResponse(200,createdMsg,"message created successfully"))
-})
-
-const sendMedia = asyncHandler(async(req,res)=>{
-    const {id} = req.params
     
-    const mediaLocalPath = req.file?.path
 
-    if(!mediaLocalPath){
-        throw new ApiError(400,"local path missing")
-    }
-
-    const media = await uploadOnCloudinary(mediaLocalPath)
-
-    if(!media?.url){
-        throw new ApiError(400,"media file missing")
-    }
-
-    if(!id){
-        throw new ApiError(400,"id is missing")
-    }
-
-    const message = await Message.create({
-          senderId:req.user._id,
-          receiverId:id,
-          image:media.url
-    })
-
-     //emit new message to the receiver
-
-    const receiverSocketId = userSocketMap[receiverId]
-    if(receiverSocketId){
-        io.to(receiverSocketId).emit("message",message)
-    }
-
-    const createdMsg = await Message.findById(message._id)
-
-    if(!createdMsg){
-        throw new ApiError(500,"message not created")
-    }
-
-    return res.status(200).json(new ApiResponse(200,createdMsg,"message created successfully"))
+    return res.status(200).json(new ApiResponse(200,message,"message created successfully"))
 })
+
+
 export {
    getUsersForSidebar,
    getMessages,
    toggleSeen,
    sendMessage,
-   sendMedia
 }
