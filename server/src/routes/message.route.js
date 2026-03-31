@@ -1,8 +1,8 @@
-import {Router, router} from "express"
+import {Router} from "express"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
 import { getMessages, getUsersForSidebar, sendMedia, sendMessage, toggleSeen } from "../controllers/message.controller.js"
 import { upload } from "../middlewares/multer.middleware.js"
-const router = Router()
+const router = Router();
 router.route("/getsidebarusers").get(verifyJWT,getUsersForSidebar)
 router.route("/getmessage/:selectedUser").get(verifyJWT,getMessages)
 router.route("/toggle/:userId").patch(toggleSeen)

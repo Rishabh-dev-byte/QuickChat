@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 import http from "http"
-import {Server} from socket.io
+import {Server} from "socket.io"
 
 const app = express()
 // express cannot handle special HTTP request

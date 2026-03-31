@@ -1,8 +1,8 @@
-import { Message } from "../models/message.model";
-import ApiError from "../utils/ApiError";
-import ApiResponse from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
-import { uploadOnCloudinary } from "../utils/Cloudinary";
+import { Message } from "../models/message.model.js";
+import ApiError from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 import {io,userSocketMap} from "../app.js"
 
 
@@ -101,7 +101,7 @@ const sendMedia = asyncHandler(async(req,res)=>{
           image:media.url
     })
 
-       //emit new message to the receiver
+     //emit new message to the receiver
 
     const receiverSocketId = userSocketMap[receiverId]
     if(receiverSocketId){
