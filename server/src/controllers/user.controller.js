@@ -187,7 +187,7 @@ const updateProfile = asyncHandler(async(req,res)=>{
 
    if(avatarLocalPath){
     const avatar = await uploadOnCloudinary(avatarLocalPath)
-    if(!avatar){
+    if(!avatar?.url){
       throw new ApiError(400,"avatar missing")
     }
     updatedFields.avatar = avatar.url;

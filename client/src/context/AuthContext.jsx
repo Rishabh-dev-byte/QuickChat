@@ -18,6 +18,9 @@ export const AuthContextProvider = ({ children }) => {
     authUser,
     onlineUsers,
     socket,
+    login,
+    logout,
+    updateprofile
   };
 
   const checkAuth = async () => {
@@ -65,13 +68,24 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  const updateBio = async(bio)=>{
+  const updateprofile = async(body)=>{
+    try {
+        const {data} = await axios.patch("/users/updateprofile",body)
+        if(data.success){
+            setAuthUser(data.data)
+            toast.success("profile update successful")
+        }
 
+    } catch (error) {
+        toast.error(error.message)
+    }
+
+ 
   }
 
   // connect socket function to handle socket function and update online users
   const connectSocket = (userData) => {
-    if (!userData || socket?.connected) return;
+    if (!userData || !socket?.connected) return;
     //Create a new socket connection
     const newSocket = io(backendUrl, {
       query: {
