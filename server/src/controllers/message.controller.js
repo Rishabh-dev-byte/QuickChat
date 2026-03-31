@@ -3,6 +3,7 @@ import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
 import { uploadOnCloudinary } from "../utils/Cloudinary";
+import {io,userSocketMap} from "../app.js"
 
 
 const getUsersForSidebar = asyncHandler(async(req,res)=>{
@@ -47,19 +48,26 @@ const toggleSeen = asyncHandler(async(req,res)=>{
 
 const sendMessage = asyncHandler(async(req,res)=>{
     const {id} = req.params
-    const {message} = req.body
+    const {text} = req.body
 
-    if(!id || !message){
+    if(!id || !text){
         throw new ApiError(400,"id or message is missing")
     }
 
-    const Message = await Message.create({
+    const message = await Message.create({
           senderId:req.user._id,
           receiverId:id,
-          text:message
+          text
     })
 
-    const createdMsg = await Message.findById(Message._id)
+    //emit new message to the receiver
+
+    const receiverSocketId = userSocketMap[receiverId]
+    if(receiverSocketId){
+        io.to(receiverSocketId).emit("message",message)
+    }
+
+    const createdMsg = await Message.findById(message._id)
 
     if(!createdMsg){
         throw new ApiError(500,"message not created")
@@ -87,13 +95,20 @@ const sendMedia = asyncHandler(async(req,res)=>{
         throw new ApiError(400,"id is missing")
     }
 
-    const Message = await Message.create({
+    const message = await Message.create({
           senderId:req.user._id,
           receiverId:id,
           image:media.url
     })
 
-    const createdMsg = await Message.findById(Message._id)
+       //emit new message to the receiver
+
+    const receiverSocketId = userSocketMap[receiverId]
+    if(receiverSocketId){
+        io.to(receiverSocketId).emit("message",message)
+    }
+
+    const createdMsg = await Message.findById(message._id)
 
     if(!createdMsg){
         throw new ApiError(500,"message not created")
